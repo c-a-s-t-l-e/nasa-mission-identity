@@ -20,10 +20,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 0.9rem; 
-  margin: 10px; 
-  padding: 10px;
-  width: 90vw; 
+  padding: 32px;
   background: #fff;
 }
 
@@ -149,6 +146,7 @@ footer img {
   font-weight: 500;
   cursor: pointer;
   font-weight: bold;
+  color: #000;
 }
 
 .upload-csv-btn img {
@@ -182,6 +180,11 @@ textarea{
   width: 100%;
   margin: auto;
   resize: none;
+}
+
+.text-input-area{
+  background: inherit;
+  color: #000;
 }
 
 
