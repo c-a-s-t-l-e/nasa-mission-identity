@@ -9,6 +9,6 @@ This tool is invaluable for researchers, students, and space enthusiasts alike, 
 
 Here's a walkthrough of the NASA Mission Identifier:
 
-<img src='https://github.com/c-a-s-t-l-e/nasa-mission-identity/blob/main/NMI_Tool_GIF.gif' />
+<img src='https://github.com/c-a-s-t-l-e/nasa-mission-identity/blob/main/new_nmi.gif' />
 
 
