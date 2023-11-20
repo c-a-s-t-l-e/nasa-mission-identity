@@ -3,6 +3,8 @@ body {
   margin: 0;
 }
 
+
+
 .top {
   /* width: 100vw; */
   min-height: 40px;
@@ -21,6 +23,7 @@ body {
   justify-content: center;
   align-items: center;
   padding: 32px;
+  height: 70vh;
   background: #fff;
 }
 
@@ -35,6 +38,10 @@ body {
   font-family: "Istok Web", sans-serif;
   font-size: 16px;
   line-height: 170%;
+}
+
+.description p{
+  line-height: 1.1;
 }
 
 .description h1 {
@@ -91,6 +98,11 @@ h1 {
 .instructions {
   max-width: 900px;
 }
+
+.instructions p{
+  text-align: center;
+}
+
 
 footer {
   height: 200px;
@@ -275,16 +287,13 @@ textarea{
   width: 80%;
   height: 65vh;
   border-radius: 8px;
-  overflow: hidden; 
+  overflow: hidden; /* Hide overflow */
 }
 
 .scroll-container {
   max-height: calc(80vh - 40px); /* Adjust height to account for padding */
   overflow-y: auto; /* Enable vertical scrolling inside this container */
 }
-
-
-
 
 .close {
   color: #aaaaaa;
@@ -306,4 +315,8 @@ textarea{
 
 .modal-span{
   color: #50C878;
+}
+
+.error{
+  color: #FC3D21;
 }

@@ -1,13 +1,13 @@
-import NMIGif from "/src/images/IRonMac.png";
-import { useNavigate } from "react-router-dom";
+import NMIGif from '/src/images/IRonMac.png';
+import { useNavigate } from 'react-router-dom';
 
 const Overview = () => {
-    let navigateTo = useNavigate()
+  let navigateTo = useNavigate();
 
-    const handleClick = () => {
-        console.log('hey')
-        navigateTo('/nasa-mission-identifier-tool')
-    }
+  const handleClick = () => {
+    console.log('inside handle click, overview.jsx');
+    navigateTo('/nasa-mission-identifier-tool');
+  };
 
   return (
     <>
@@ -20,18 +20,18 @@ const Overview = () => {
             NASA MISSION <br /> IDENTIFIER (<span>NMI</span>)
           </h1>
           <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-            Pellentesque auctor aliquet diam, sed vestibulum nibh scelerisque
-            fringilla. Maecenas dictum lectus sed tincidunt egestas. Orci varius
-            natoque penatibus et magnis dis parturient montes, nascetur
-            ridiculus mus.
+            The NASA Mission Identifier is a cutting-edge tool designed for the
+            cosmically curious. It provides a unique platform for users to
+            upload either an abstract or a CSV file, then scans the content for
+            references to NASA missions. Upon detecting a mission, the tool
+            provides comprehensive information, including the PID, mission name,
+            type, launch date, and launch location.
           </p>
 
           <p>
-            Donec egestas, justo ac faucibus bibendum, nulla magna mollis ante,
-            in aliquam arcu ligula sit amet ipsum. Cras nunc metus, vehicula a
-            sodales in, vehicula vitae felis. Morbi quis orci eget leo
-            consectetur luctus.
+            This tool is invaluable for researchers, students, and space
+            enthusiasts alike, who are seeking to connect their studies or
+            interests with specific NASA missions.
           </p>
 
           <button onClick={handleClick}>Find Missions</button>
