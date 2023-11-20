@@ -5,30 +5,38 @@ from spacy.tokens import Span
 from flask import jsonify
 
 
-# take in file as parameter to allow users to upload their own abstracts
+# allow users to upload their own abstracts
 def get_missions(input):
     export = pd.read_csv("export_mission.csv")
 
-    # check if input is a DataFrame or a file path
-    if isinstance(input, pd.DataFrame):
-        # if DataFrame use it directly
-        review = input
-    else:
-        # read the csv uploaded
-        review = pd.read_csv(input)
+    review = input
+
+    export["MONTH"] = export["MONTH"].astype(str).str.zfill(2)
+    export["DAY"] = export["DAY"].astype(str).str.zfill(2)
+
+    # Create 'LAUNCH DATE' column by concatenating YEAR, MONTH, and DAY
+    export["LAUNCH DATE"] = (
+        export["MONTH"].astype(str) + "/" + export["DAY"] + "/" + export["YEAR"]
+    )
+
+    # get the pid and other columns for each mission
+    pid_name = export[
+        ["PID", "NAME", "MISSION TYPE", "LAUNCH LOCATION", "LAUNCH DATE"]
+    ][0:]
 
     # reset the index column in the review sheet since the first two columns do not contain data
     # ABSTRACT_NUM will be used to merge to the results later
-    review["ABSTRACT_NUM"] = 0
-    print(review["ABSTRACT_NUM"])
     # move ABSTRACT_NUM to the start of the dataframe
-    first_column = review.pop("ABSTRACT_NUM")
-    review.insert(0, "ABSTRACT_NUM", first_column)
+    # print("before")
+    # print(review)
+    # first_column = review.pop("ABSTRACT_NUM")
+    # print("first col")
+    # print(first_column)
+    # review.insert(0, "ABSTRACT_NUM", first_column)
+    # print("AFTER")
 
-    # get the pid and name for each mission
-    pid_name = export[["PID", "NAME"]][0:]
-    # grab the abstracts from the review csv
-    # print(review["ABSTRACT"])
+    # print(review)
+
     abstracts = pd.DataFrame(review["ABSTRACT"][0:])
 
     # reset the index values
@@ -66,22 +74,22 @@ def get_missions(input):
     # get the matches in each abstract
     matches = [matcher(doc) for doc in doc_abs]
 
-    # make an empty dataframe
-    doc_dataframe = pd.DataFrame(columns=["ABSTRACT_NUM", "NAME"])
-
-    # fill the dataframe with matches that exist in the abstracts
-    count = 0
+    rows_to_append = []
+    count = 0  # Initialize count outside the loop
     for match_list in matches:
         for match_id, start, end in match_list:
-            rule_id = nlp.vocab.strings[match_id]
             span = doc_abs[count][start:end]
-            doc_dataframe.loc[len(doc_dataframe)] = [count, span.text]
-        count += 1
+            matched_name = span.text
+            matched_row = pid_name[pid_name["NAME"] == matched_name]
+            if not matched_row.empty:
+                # Add the row to the list
+                rows_to_append.append(matched_row.iloc[0].to_dict())
+        count += 1  # Increment count after processing each abstract
+
+    # Convert the list of rows to a DataFrame
+    doc_dataframe = pd.DataFrame(rows_to_append)
 
     ######################################################################
-
-    # merge the mission names with their respective pid's,
-    doc_dataframe = doc_dataframe.merge(pid_name, on="NAME")
 
     # rename the PID column to MISSION PID
     doc_dataframe = doc_dataframe.rename(columns={"PID": "AUTO MISSION PID"})
@@ -90,16 +98,15 @@ def get_missions(input):
     review.drop(review.iloc[:, 10:], inplace=True, axis=1)
 
     # merge the review csv with the ABSTRACT_NUM column
-    doc_dataframe = doc_dataframe.merge(review, on="ABSTRACT_NUM")
+    # doc_dataframe = doc_dataframe.merge(review, on="ABSTRACT_NUM")
 
     # Select specific columns
-    filtered_dataframe = doc_dataframe[["ABSTRACT_NUM", "NAME", "AUTO MISSION PID"]]
+    filtered_dataframe = doc_dataframe[
+        ["NAME", "AUTO MISSION PID", "MISSION TYPE", "LAUNCH LOCATION", "LAUNCH DATE"]
+    ]
 
     # remove duplicates
     filtered_dataframe.drop_duplicates(inplace=True)
-
-    # create a new LINK column and set the results to "Y"
-    doc_dataframe["LINK"] = "Y"
 
     # returns all matches and converts it to JSON
     return filtered_dataframe.to_json()
@@ -113,12 +120,6 @@ def get_missions_csv(file):
     review = pd.read_csv(file)
     export = pd.read_csv("export_mission.csv")
 
-    # Add missing columns with default values if they don't exist
-    if "TITLE" not in review.columns:
-        review["TITLE"] = "Default Title"
-    if "CITATION SOURCE" not in review.columns:
-        review["CITATION SOURCE"] = "Default Citation Source"
-
     # reset the index column in the review sheet since the first two columns do not contain data
     # ABSTRACT_NUM will be used to merge to the results later
     review["ABSTRACT_NUM"] = review.index
@@ -127,8 +128,18 @@ def get_missions_csv(file):
     first_column = review.pop("ABSTRACT_NUM")
     review.insert(0, "ABSTRACT_NUM", first_column)
 
+    export["MONTH"] = export["MONTH"].astype(str).str.zfill(2)
+    export["DAY"] = export["DAY"].astype(str).str.zfill(2)
+
+    # Create 'LAUNCH DATE' column by concatenating YEAR, MONTH, and DAY
+    export["LAUNCH DATE"] = (
+        export["MONTH"].astype(str) + "/" + export["DAY"] + "/" + export["YEAR"]
+    )
+
     # get the pid and name for each mission
-    pid_name = export[["PID", "NAME"]][0:]
+    pid_name = export[
+        ["PID", "NAME", "MISSION TYPE", "LAUNCH LOCATION", "LAUNCH DATE"]
+    ][0:]
 
     # grab the abstracts from the review csv
     abstracts = pd.DataFrame(review["ABSTRACT"][0:])
@@ -196,7 +207,14 @@ def get_missions_csv(file):
 
     # Select specific columns
     filtered_dataframe = doc_dataframe[
-        ["ABSTRACT_NUM", "NAME", "AUTO MISSION PID", "TITLE", "CITATION SOURCE"]
+        [
+            "ABSTRACT_NUM",
+            "NAME",
+            "AUTO MISSION PID",
+            "LAUNCH LOCATION",
+            "MISSION TYPE",
+            "LAUNCH DATE",
+        ]
     ]
 
     # remove duplicates
