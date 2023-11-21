@@ -5,6 +5,12 @@ Collaborators: **Abram Astle & Randal Ary Michel**
 Overview: *This tool is designed for the cosmically curious. It provides a unique platform for users to upload either an abstract or a CSV file, then scans the content for references to NASA missions. Upon detection, it furnishes detailed information including the mission name, PID, Title, and Citation Source.
 This tool is invaluable for researchers, students, and space enthusiasts alike, who are seeking to connect their studies or interests with specific NASA missions.*
 
+## Technologies used
+
+**Python, Flask, Pandas, SpaCy, vite + React**
+
+The NASA Mission Identifier leverages a natural language library called SpaCy in order to pinpoint missions that are stated in the abstract. Pandas, a python data analysis library, turns user submitted abstracts or CSVs into a structured dataframe and then cross references it against a vast repository of NASA related missions, returning key information such as mission type and launch details.
+
 ## Video Walkthrough
 
 Here's a walkthrough of the NASA Mission Identifier:
