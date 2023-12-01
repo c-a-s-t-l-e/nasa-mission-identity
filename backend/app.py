@@ -1,10 +1,11 @@
-from flask import Flask, request
+from flask import Flask, request, send_from_directory, session
 from flask_cors import CORS
 from data_processing import get_missions, get_missions_csv
 import pandas as pd
 
 app = Flask(__name__)
-CORS(app)
+app.secret_key = "test123"
+CORS(app, supports_credentials=True)
 
 
 # endpoint allows users to submit a single abstract
@@ -35,7 +36,7 @@ def upload_file():
     #  get file from req body
     if "file" not in request.files:
         return "No file uploaded!"
-    print("file successfully selected")
+
     file = request.files["file"]
 
     # check if the uploaded file is a CSV
@@ -43,5 +44,25 @@ def upload_file():
         return "Invalid file type! Please upload a CSV."
 
     print("sending csv to data processing")
-    missions = get_missions_csv(file)
-    return missions
+    res = get_missions_csv(file)
+
+    # Set the session variable
+    session["csv_filename"] = res["filename"]
+    print(session)
+    return {"data": res["data"], "filename": res["filename"]}
+
+
+@app.route("/file-download/<filename>")
+def file_downloads(filename):
+    print(session)
+    # dir path needs to be changed for prod
+    directory_path = "/Users/randalmichel/NMI-tool/nasa-mission-identity/backend/"
+    try:
+        return send_from_directory(
+            directory_path,
+            filename,
+            as_attachment=True,
+            download_name="missions_output.csv",
+        )
+    except Exception as e:
+        return str(e)

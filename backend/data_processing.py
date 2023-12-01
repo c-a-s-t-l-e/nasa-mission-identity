@@ -2,7 +2,14 @@ import pandas as pd
 import spacy
 from spacy.matcher import PhraseMatcher
 from spacy.tokens import Span
-from flask import jsonify
+from flask import jsonify, session
+from datetime import datetime
+
+
+# Generate a unique filename for user CSV file
+def generate_unique_filename():
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    return f"missions_outputs_{timestamp}.csv"
 
 
 # allow users to upload their own abstracts
@@ -120,7 +127,6 @@ def get_missions_csv(file):
     review = pd.read_csv(file)
     export = pd.read_csv("export_mission.csv")
 
-    # reset the index column in the review sheet since the first two columns do not contain data
     # ABSTRACT_NUM will be used to merge to the results later
     review["ABSTRACT_NUM"] = review.index
 
@@ -199,14 +205,20 @@ def get_missions_csv(file):
     # rename the PID column to MISSION PID
     doc_dataframe = doc_dataframe.rename(columns={"PID": "AUTO MISSION PID"})
 
-    # drop the columns after the ABSTRACT
-    review.drop(review.iloc[:, 10:], inplace=True, axis=1)
+    # Merge matched data back into the original DataFrame
+    merged_dataframe = review.merge(doc_dataframe, on="ABSTRACT_NUM", how="left")
 
-    # merge the review csv with the ABSTRACT_NUM column
-    doc_dataframe = doc_dataframe.merge(review, on="ABSTRACT_NUM")
+    # Fill NaN values with None or another placeholder
+    merged_dataframe.fillna("None", inplace=True)
 
-    # Select specific columns
-    filtered_dataframe = doc_dataframe[
+    # Get unique file name to avoid race conditions
+    unique_filename = generate_unique_filename()
+
+    # Save merged data to csv
+    merged_dataframe.to_csv(unique_filename, index=False)
+
+    # Return only the columns with matched data in JSON format
+    filtered_dataframe = merged_dataframe[
         [
             "ABSTRACT_NUM",
             "NAME",
@@ -215,13 +227,10 @@ def get_missions_csv(file):
             "MISSION TYPE",
             "LAUNCH DATE",
         ]
-    ]
+    ].dropna()
 
     # remove duplicates
     filtered_dataframe.drop_duplicates(inplace=True)
 
-    # create a new LINK column and set the results to "Y"
-    doc_dataframe["LINK"] = "Y"
-
     # returns all matches and converts it to JSON
-    return filtered_dataframe.to_json()
+    return {"data": filtered_dataframe.to_json(), "filename": unique_filename}
