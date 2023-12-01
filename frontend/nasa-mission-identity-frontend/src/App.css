@@ -295,6 +295,9 @@ textarea{
   overflow-y: auto; /* Enable vertical scrolling inside this container */
 }
 
+
+
+
 .close {
   color: #aaaaaa;
   float: right;
@@ -319,4 +322,10 @@ textarea{
 
 .error{
   color: #FC3D21;
+}
+
+.download-link{
+  color: #0b3d91;
+  text-decoration: underline;
+  cursor: pointer;
 }
