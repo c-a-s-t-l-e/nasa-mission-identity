@@ -6,7 +6,7 @@ const Overview = () => {
 
   const handleClick = () => {
     console.log('inside handle click, overview.jsx');
-    navigateTo('/nasa-mission-identifier-tool');
+    navigateTo('/nasa-mission-tagger-tool');
   };
 
   return (
@@ -17,10 +17,10 @@ const Overview = () => {
         </div>
         <div className="description">
           <h1>
-            NASA MISSION <br /> IDENTIFIER (<span>NMI</span>)
+            NASA MISSION <br /> TAGGER (<span>NMT</span>)
           </h1>
           <p>
-            The NASA Mission Identifier is a cutting-edge tool designed for the
+            The NASA Mission Tagger is a cutting-edge tool designed for the
             cosmically curious. It provides a unique platform for users to
             upload either an abstract or a CSV file, then scans the content for
             references to NASA missions. Upon detecting a mission, the tool
